@@ -3,44 +3,44 @@
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
-// Confirmation modal for deleting an agent
 const DeleteAgentModal = ({ isOpen, onClose, onConfirm, agent, isDeleting }) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
         <Transition.Child
           as={Fragment}
-          enter="ease-out duration-300"
+          enter="ease-out duration-200"
           enterFrom="opacity-0"
           enterTo="opacity-100"
-          leave="ease-in duration-200"
+          leave="ease-in duration-150"
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/50" />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-center justify-center p-4">
             <Transition.Child
               as={Fragment}
-              enter="ease-out duration-300"
+              enter="ease-out duration-200"
               enterFrom="opacity-0 scale-95"
               enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
+              leave="ease-in duration-150"
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-base-100 p-6 text-left align-middle shadow-xl transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-error/20 flex items-center justify-center">
+              <Dialog.Panel className="w-full max-w-[400px] bg-white rounded-xl shadow-xl p-6">
+                {/* Icon and title */}
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-[#FEF2F2] flex items-center justify-center flex-shrink-0">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
                       strokeWidth={1.5}
                       stroke="currentColor"
-                      className="w-6 h-6 text-error"
+                      className="w-5 h-5 text-[#DC2626]"
                     >
                       <path
                         strokeLinecap="round"
@@ -50,27 +50,24 @@ const DeleteAgentModal = ({ isOpen, onClose, onConfirm, agent, isDeleting }) => 
                     </svg>
                   </div>
                   <div>
-                    <Dialog.Title
-                      as="h3"
-                      className="text-lg font-semibold leading-6"
-                    >
+                    <Dialog.Title className="text-h4">
                       Delete Agent
                     </Dialog.Title>
-                    <p className="text-sm text-base-content/60 mt-1">
+                    <p className="text-body-sm mt-0.5">
                       This action cannot be undone.
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <p className="text-sm">
-                    Are you sure you want to delete{" "}
-                    <span className="font-semibold">{agent?.name}</span>? All
-                    associated data will be permanently removed.
-                  </p>
-                </div>
+                {/* Body */}
+                <p className="text-[14px] text-[#52525B] leading-[1.6] mb-6">
+                  Are you sure you want to delete{" "}
+                  <span className="font-semibold text-[#18181B]">{agent?.name}</span>?
+                  All associated data will be permanently removed.
+                </p>
 
-                <div className="mt-6 flex gap-3 justify-end">
+                {/* Actions */}
+                <div className="flex gap-3 justify-end">
                   <button
                     type="button"
                     className="btn btn-ghost"
@@ -81,14 +78,12 @@ const DeleteAgentModal = ({ isOpen, onClose, onConfirm, agent, isDeleting }) => 
                   </button>
                   <button
                     type="button"
-                    className="btn btn-error"
+                    className="btn !bg-[#DC2626] !border-[#DC2626] !text-white hover:!bg-[#B91C1C] hover:!border-[#B91C1C]"
                     onClick={onConfirm}
                     disabled={isDeleting}
                   >
-                    {isDeleting && (
-                      <span className="loading loading-spinner loading-sm"></span>
-                    )}
-                    Delete Agent
+                    {isDeleting && <div className="loading-spinner !w-4 !h-4 !border-white/30 !border-t-white" />}
+                    Delete
                   </button>
                 </div>
               </Dialog.Panel>

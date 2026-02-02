@@ -11,10 +11,7 @@ import DeleteAgentModal from "@/components/agents/DeleteAgentModal";
 export default function AgentsPage() {
   const [agents, setAgents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    agent: null,
-  });
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, agent: null });
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
@@ -38,7 +35,6 @@ export default function AgentsPage() {
 
   const handleDeleteConfirm = async () => {
     if (!deleteModal.agent) return;
-
     setIsDeleting(true);
     try {
       await apiClient.delete(`/agents/${deleteModal.agent.id}`);
@@ -60,46 +56,37 @@ export default function AgentsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <span className="loading loading-spinner loading-lg"></span>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="loading-spinner" />
       </div>
     );
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto">
+    <div className="p-6 lg:p-8 max-w-[1200px] mx-auto">
+      {/* Page header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold">AI Agents</h1>
-          <p className="text-base-content/60 mt-1">
-            Manage your voice AI agents
+          <h1 className="text-h2 mb-1">AI Agents</h1>
+          <p className="text-body-sm">
+            Create and manage your voice AI agents.
           </p>
         </div>
         {agents.length > 0 && (
           <Link href="/dashboard/agents/new" className="btn btn-primary">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             New Agent
           </Link>
         )}
       </div>
 
+      {/* Agent grid or empty state */}
       {agents.length === 0 ? (
         <AgentEmptyState />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {agents.map((agent) => (
             <AgentCard
               key={agent.id}

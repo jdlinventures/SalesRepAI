@@ -2,18 +2,16 @@
 
 import Link from "next/link";
 
-// Empty state shown when user has no agents
 const AgentEmptyState = () => {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-4">
-      <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+    <div className="empty-state">
+      <div className="empty-state-icon">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-12 h-12 text-primary"
         >
           <path
             strokeLinecap="round"
@@ -23,10 +21,10 @@ const AgentEmptyState = () => {
         </svg>
       </div>
 
-      <h3 className="text-xl font-semibold mb-2">No agents yet</h3>
-      <p className="text-base-content/60 text-center max-w-md mb-6">
+      <h3 className="text-h3 mb-2">No agents yet</h3>
+      <p className="text-body-sm max-w-[360px] mb-8">
         Create your first AI voice agent to start making and receiving calls.
-        Configure the voice, personality, and knowledge base to match your needs.
+        Configure voice, personality, and knowledge base.
       </p>
 
       <Link href="/dashboard/agents/new" className="btn btn-primary">
@@ -36,7 +34,7 @@ const AgentEmptyState = () => {
           viewBox="0 0 24 24"
           strokeWidth={1.5}
           stroke="currentColor"
-          className="w-5 h-5"
+          className="w-4 h-4"
         >
           <path
             strokeLinecap="round"

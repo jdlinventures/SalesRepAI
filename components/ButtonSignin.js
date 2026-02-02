@@ -6,10 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import config from "@/config";
 
-// A simple button to sign in with our providers (Google & Magic Links).
-// It automatically redirects user to callbackUrl (config.auth.callbackUrl) after login, which is normally a private page for users to manage their accounts.
-// If the user is already logged in, it will show their profile picture & redirect them to callbackUrl immediately.
-const ButtonSignin = ({ text = "Get started", extraStyle }) => {
+// Premium black button for sign in
+const ButtonSignin = ({ text = "Get Started", extraStyle }) => {
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -25,7 +23,7 @@ const ButtonSignin = ({ text = "Get started", extraStyle }) => {
     return (
       <Link
         href={config.auth.callbackUrl}
-        className={`btn ${extraStyle ? extraStyle : ""}`}
+        className={`btn ${extraStyle ? extraStyle : "btn-primary"}`}
       >
         {session.user?.image ? (
           <img
@@ -37,7 +35,7 @@ const ButtonSignin = ({ text = "Get started", extraStyle }) => {
             height={24}
           />
         ) : (
-          <span className="w-6 h-6 bg-base-300 flex justify-center items-center rounded-full shrink-0">
+          <span className="w-6 h-6 bg-zinc-200 flex justify-center items-center rounded-full shrink-0 text-zinc-700 text-sm font-medium">
             {session.user?.name?.charAt(0) || session.user?.email?.charAt(0)}
           </span>
         )}
@@ -48,7 +46,7 @@ const ButtonSignin = ({ text = "Get started", extraStyle }) => {
 
   return (
     <button
-      className={`btn ${extraStyle ? extraStyle : ""}`}
+      className={`btn ${extraStyle ? extraStyle : "btn-primary"}`}
       onClick={handleClick}
     >
       {text}
