@@ -42,46 +42,43 @@ const CallTranscript = ({ transcript, isLive = false }) => {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col gap-4 h-72 overflow-y-auto p-4 bg-base-200/50 rounded-xl border border-base-300"
+      className="flex flex-col gap-3 h-72 overflow-y-auto p-4 bg-base-200/50 rounded-xl border border-base-300 text-left"
     >
-      {transcript.map((entry, index) => (
-        <div
-          key={index}
-          className={`flex ${
-            entry.role === "user" ? "justify-end" : "justify-start"
-          }`}
-        >
+      {transcript.map((entry, index) => {
+        const isUser = entry.role === "user";
+        return (
           <div
-            className={`max-w-[85%] ${
-              entry.interim ? "opacity-50" : ""
-            }`}
+            key={index}
+            className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}
           >
-            {/* Speaker label */}
             <div
-              className={`text-xs font-semibold mb-1 px-1 ${
-                entry.role === "user"
-                  ? "text-right text-primary"
-                  : "text-left text-secondary"
-              }`}
+              className={`max-w-[80%] ${entry.interim ? "opacity-50" : ""}`}
             >
-              {entry.role === "user" ? "You" : "Agent"}
-            </div>
+              {/* Speaker label */}
+              <div
+                className={`text-xs font-medium mb-1 ${
+                  isUser ? "text-right text-primary/70" : "text-left text-secondary/70"
+                }`}
+              >
+                {isUser ? "You" : "Agent"}
+              </div>
 
-            {/* Message bubble */}
-            <div
-              className={`px-4 py-3 rounded-2xl shadow-sm ${
-                entry.role === "user"
-                  ? "bg-primary text-primary-content rounded-tr-sm"
-                  : "bg-base-100 text-base-content rounded-tl-sm border border-base-300"
-              }`}
-            >
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {entry.content}
-              </p>
+              {/* Message bubble */}
+              <div
+                className={`px-4 py-2.5 rounded-2xl ${
+                  isUser
+                    ? "bg-primary text-primary-content rounded-br-md ml-auto"
+                    : "bg-base-100 text-base-content rounded-bl-md border border-base-300 mr-auto"
+                }`}
+              >
+                <p className={`text-sm leading-relaxed whitespace-pre-wrap ${isUser ? "text-left" : "text-left"}`}>
+                  {entry.content}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {/* Invisible element to scroll to */}
       <div ref={bottomRef} />
