@@ -6,10 +6,11 @@ import logo from "@/app/icon.png";
 const Footer = () => {
   return (
     <footer className="bg-white border-t border-[#E4E4E7]">
-      <div className="container-lg py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-          {/* Brand Column */}
-          <div className="col-span-2 md:col-span-1">
+      <div className="max-w-[1080px] mx-auto px-6 py-16">
+        {/* Main footer content */}
+        <div className="flex flex-col lg:flex-row justify-between gap-12 lg:gap-16">
+          {/* Brand Column - Left side */}
+          <div className="lg:max-w-[280px]">
             <Link href="/" className="inline-flex items-center gap-2.5 mb-4">
               <Image
                 src={logo}
@@ -23,107 +24,100 @@ const Footer = () => {
                 {config.appName}
               </span>
             </Link>
-            <p className="text-[14px] leading-[1.6] text-[#71717A] max-w-[240px]">
+            <p className="text-[14px] leading-[1.6] text-[#71717A]">
               {config.appDescription}
             </p>
           </div>
 
-          {/* Product Column */}
-          <div>
-            <h4 className="text-[13px] font-semibold text-[#18181B] uppercase tracking-[0.05em] mb-4">
-              Product
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  href="/#features"
-                  className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
-                >
-                  Features
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#how-it-works"
-                  className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
-                >
-                  How It Works
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/pricing"
-                  className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
-                >
-                  Pricing
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company Column */}
-          <div>
-            <h4 className="text-[13px] font-semibold text-[#18181B] uppercase tracking-[0.05em] mb-4">
-              Company
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  href="/about"
-                  className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
-                >
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/blog"
-                  className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
-                >
-                  Blog
-                </Link>
-              </li>
-              {config.resend.supportEmail && (
+          {/* Links Columns - Right side */}
+          <div className="grid grid-cols-3 gap-8 lg:gap-16">
+            {/* Product Column */}
+            <div>
+              <h4 className="text-[13px] font-semibold text-[#18181B] uppercase tracking-[0.05em] mb-4">
+                Product
+              </h4>
+              <ul className="space-y-3">
                 <li>
-                  <a
-                    href={`mailto:${config.resend.supportEmail}`}
+                  <Link
+                    href="/#features"
                     className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
                   >
-                    Contact
-                  </a>
+                    Features
+                  </Link>
                 </li>
-              )}
-            </ul>
-          </div>
+                <li>
+                  <Link
+                    href="/#how-it-works"
+                    className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
+                  >
+                    How It Works
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/pricing"
+                    className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
+                  >
+                    Pricing
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-          {/* Legal Column */}
-          <div>
-            <h4 className="text-[13px] font-semibold text-[#18181B] uppercase tracking-[0.05em] mb-4">
-              Legal
-            </h4>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  href="/privacy-policy"
-                  className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
-                >
-                  Privacy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/tos"
-                  className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
-                >
-                  Terms
-                </Link>
-              </li>
-            </ul>
+            {/* Company Column */}
+            <div>
+              <h4 className="text-[13px] font-semibold text-[#18181B] uppercase tracking-[0.05em] mb-4">
+                Company
+              </h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link
+                    href="/about"
+                    className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
+                  >
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/blog"
+                    className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
+                  >
+                    Blog
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Legal Column */}
+            <div>
+              <h4 className="text-[13px] font-semibold text-[#18181B] uppercase tracking-[0.05em] mb-4">
+                Legal
+              </h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link
+                    href="/privacy-policy"
+                    className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
+                  >
+                    Privacy
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/tos"
+                    className="text-[14px] text-[#71717A] hover:text-[#18181B] transition-colors"
+                  >
+                    Terms
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-12 mt-12 border-t border-[#E4E4E7]">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-10 mt-12 border-t border-[#E4E4E7]">
           <p className="text-[13px] text-[#A1A1AA]">
             &copy; {new Date().getFullYear()} {config.appName}. All rights reserved.
           </p>
