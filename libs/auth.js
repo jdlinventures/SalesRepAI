@@ -6,10 +6,17 @@ import config from "@/config"
 import connectMongo from "./mongo"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  
+
   // Set any random key in .env.local
   secret: process.env.NEXTAUTH_SECRET,
-  
+
+  // Custom pages
+  pages: {
+    signIn: "/signin",
+    verifyRequest: "/signin/verify",
+    error: "/signin",
+  },
+
   // Add EmailProvider only for server-side usage (not edge-compatible)
   providers: [
     // Follow the "Login with Email" tutorial to set up your email server

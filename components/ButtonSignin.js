@@ -1,23 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import config from "@/config";
 
 // Premium black button for sign in
 const ButtonSignin = ({ text = "Get Started", extraStyle }) => {
-  const router = useRouter();
   const { data: session, status } = useSession();
-
-  const handleClick = () => {
-    if (status === "authenticated") {
-      router.push(config.auth.callbackUrl);
-    } else {
-      signIn(undefined, { callbackUrl: config.auth.callbackUrl });
-    }
-  };
 
   if (status === "authenticated") {
     return (
@@ -35,7 +25,7 @@ const ButtonSignin = ({ text = "Get Started", extraStyle }) => {
             height={24}
           />
         ) : (
-          <span className="w-6 h-6 bg-zinc-200 flex justify-center items-center rounded-full shrink-0 text-zinc-700 text-sm font-medium">
+          <span className="w-6 h-6 bg-[#F4F4F5] flex justify-center items-center rounded-full shrink-0 text-[#52525B] text-sm font-medium">
             {session.user?.name?.charAt(0) || session.user?.email?.charAt(0)}
           </span>
         )}
@@ -45,12 +35,12 @@ const ButtonSignin = ({ text = "Get Started", extraStyle }) => {
   }
 
   return (
-    <button
+    <Link
+      href={`/signin?callbackUrl=${encodeURIComponent(config.auth.callbackUrl)}`}
       className={`btn ${extraStyle ? extraStyle : "btn-primary"}`}
-      onClick={handleClick}
     >
       {text}
-    </button>
+    </Link>
   );
 };
 
