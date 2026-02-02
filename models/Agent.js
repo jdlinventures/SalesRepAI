@@ -1,6 +1,45 @@
 import mongoose from "mongoose";
 import toJSON from "./plugins/toJSON";
 
+// Schema for knowledge base items (URLs and files)
+const knowledgeBaseItemSchema = new mongoose.Schema(
+  {
+    type: {
+      type: String,
+      enum: ["url", "file"],
+      required: true,
+    },
+    // For URLs
+    url: {
+      type: String,
+    },
+    // For files
+    fileName: {
+      type: String,
+    },
+    fileUrl: {
+      type: String, // Vercel Blob URL
+    },
+    fileSize: {
+      type: Number, // in bytes
+    },
+    mimeType: {
+      type: String,
+    },
+    // Extracted text content (for provider APIs)
+    extractedText: {
+      type: String,
+      maxlength: 100000,
+    },
+    // Metadata
+    addedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { _id: false }
+);
+
 // AGENT SCHEMA
 const agentSchema = mongoose.Schema(
   {
@@ -36,10 +75,16 @@ const agentSchema = mongoose.Schema(
       required: true,
       maxlength: 1000,
     },
-    // Knowledge base URLs for context
+    // Knowledge base (URLs and files)
     knowledgeBase: {
-      type: [String],
+      type: [knowledgeBaseItemSchema],
       default: [],
+      validate: {
+        validator: function (v) {
+          return v.length <= 20; // Max 20 knowledge base items
+        },
+        message: "Maximum 20 knowledge base items allowed",
+      },
     },
     // Voice configuration
     voiceId: {
@@ -54,7 +99,7 @@ const agentSchema = mongoose.Schema(
     llmModel: {
       type: String,
       required: true,
-      default: "gpt-4",
+      default: "gpt-4o",
     },
     // Language code (e.g., "en-US")
     language: {
