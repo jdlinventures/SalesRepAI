@@ -33,42 +33,52 @@ export const voices = [
 export const models = [
   { id: "gpt-4o", name: "GPT-4o" },
   { id: "gpt-4o-mini", name: "GPT-4o Mini" },
-  { id: "gpt-4-turbo", name: "GPT-4 Turbo" },
-  { id: "claude-3.5-sonnet", name: "Claude 3.5 Sonnet" },
-  { id: "claude-3-haiku", name: "Claude 3 Haiku" },
+  { id: "gpt-4.1", name: "GPT-4.1" },
+  { id: "claude-4.5-sonnet", name: "Claude 4.5 Sonnet" },
+  { id: "claude-3.5-haiku", name: "Claude 3.5 Haiku" },
 ];
 
 /**
- * Map SalesRepAI agent data to Retell API format
+ * Map agent data to Retell LLM format
  */
-function mapToRetellFormat(agentData) {
+function mapToRetellLlmFormat(agentData) {
+  return {
+    model: agentData.llmModel || "gpt-4o",
+    general_prompt: agentData.systemPrompt,
+    begin_message: agentData.firstMessage,
+    general_tools: [
+      {
+        type: "end_call",
+        name: "end_call",
+        description: "End the call when the conversation is complete",
+      },
+    ],
+  };
+}
+
+/**
+ * Map SalesRepAI agent data to Retell Agent API format
+ */
+function mapToRetellAgentFormat(agentData, llmId) {
   return {
     agent_name: agentData.name,
     voice_id: agentData.voiceId,
     response_engine: {
       type: "retell-llm",
-      llm_id: null, // Use default
+      llm_id: llmId,
     },
-    llm_websocket_url: null, // For custom LLM integration
     language: agentData.language || "en-US",
     voice_temperature: 0.7,
     voice_speed: 1.0,
     responsiveness: 0.5,
     interruption_sensitivity: 0.5,
     enable_backchannel: true,
-    begin_message: agentData.firstMessage,
-    general_prompt: agentData.systemPrompt,
-    // Knowledge base as general tools context
-    general_tools: agentData.knowledgeBase?.length > 0 ? [{
-      type: "end_call",
-      name: "end_call",
-      description: "End the call when the conversation is complete",
-    }] : [],
   };
 }
 
 /**
  * Create a new agent with Retell
+ * First creates an LLM, then creates an agent using that LLM
  */
 export async function createAgent(agentData) {
   if (!isProviderConfigured("retell")) {
@@ -77,9 +87,19 @@ export async function createAgent(agentData) {
   }
 
   return withProviderErrorHandling("retell", "create", async () => {
-    const payload = mapToRetellFormat(agentData);
-    const response = await retellClient.post("/create-agent", payload);
-    return { providerAgentId: response.data.agent_id };
+    // Step 1: Create the LLM with the prompt and model
+    const llmPayload = mapToRetellLlmFormat(agentData);
+    const llmResponse = await retellClient.post("/create-retell-llm", llmPayload);
+    const llmId = llmResponse.data.llm_id;
+
+    // Step 2: Create the agent using the LLM ID
+    const agentPayload = mapToRetellAgentFormat(agentData, llmId);
+    const agentResponse = await retellClient.post("/create-agent", agentPayload);
+
+    return {
+      providerAgentId: agentResponse.data.agent_id,
+      providerLlmId: llmId,
+    };
   });
 }
 
@@ -93,8 +113,24 @@ export async function updateAgent(providerAgentId, agentData) {
   }
 
   return withProviderErrorHandling("retell", "update", async () => {
-    const payload = mapToRetellFormat(agentData);
-    await retellClient.patch(`/update-agent/${providerAgentId}`, payload);
+    // First get the current agent to find the LLM ID
+    const agentResponse = await retellClient.get(`/get-agent/${providerAgentId}`);
+    const llmId = agentResponse.data.response_engine?.llm_id;
+
+    // Update the LLM if we have one
+    if (llmId) {
+      const llmPayload = mapToRetellLlmFormat(agentData);
+      await retellClient.patch(`/update-retell-llm/${llmId}`, llmPayload);
+    }
+
+    // Update the agent
+    const agentPayload = {
+      agent_name: agentData.name,
+      voice_id: agentData.voiceId,
+      language: agentData.language || "en-US",
+    };
+    await retellClient.patch(`/update-agent/${providerAgentId}`, agentPayload);
+
     return { success: true };
   });
 }

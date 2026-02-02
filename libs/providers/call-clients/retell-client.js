@@ -7,6 +7,7 @@ export class RetellCallClient {
   constructor() {
     this.client = new RetellWebClient();
     this.isConnected = false;
+    this.isMuted = false;
     this.eventHandlers = {};
   }
 
@@ -63,6 +64,11 @@ export class RetellCallClient {
         sampleRate: 24000,
         captureDeviceId: "default",
       });
+      // Manually trigger call_started since SDK may not fire it reliably
+      if (this.eventHandlers.call_started && !this.isConnected) {
+        this.isConnected = true;
+        this.eventHandlers.call_started();
+      }
     } catch (error) {
       console.error("Retell startCall error:", error);
       throw error;
@@ -78,6 +84,36 @@ export class RetellCallClient {
       console.error("Retell endCall error:", error);
       throw error;
     }
+  }
+
+  // Mute microphone
+  mute() {
+    try {
+      this.client.mute();
+      this.isMuted = true;
+    } catch (error) {
+      console.error("Retell mute error:", error);
+    }
+  }
+
+  // Unmute microphone
+  unmute() {
+    try {
+      this.client.unmute();
+      this.isMuted = false;
+    } catch (error) {
+      console.error("Retell unmute error:", error);
+    }
+  }
+
+  // Toggle mute state
+  toggleMute() {
+    if (this.isMuted) {
+      this.unmute();
+    } else {
+      this.mute();
+    }
+    return this.isMuted;
   }
 
   // Clean up resources

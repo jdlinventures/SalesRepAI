@@ -28,10 +28,12 @@ const CallInterface = ({ agentId }) => {
     transcript,
     duration,
     error,
+    isMuted,
     isConnected,
     isConnecting,
     startCall,
     endCall,
+    toggleMute,
     reset,
   } = useCall(agentId);
 
@@ -206,8 +208,10 @@ const CallInterface = ({ agentId }) => {
             {/* Controls */}
             <CallControls
               status={status}
+              isMuted={isMuted}
               onStartCall={handleStartCall}
               onEndCall={endCall}
+              onToggleMute={toggleMute}
               onReset={reset}
               isDisabled={!canMakeCall}
             />

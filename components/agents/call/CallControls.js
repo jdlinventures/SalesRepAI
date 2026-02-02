@@ -1,16 +1,19 @@
 "use client";
 
-// Call control buttons (start/end call)
+// Call control buttons (start/end/mute)
 const CallControls = ({
   status,
+  isMuted,
   onStartCall,
   onEndCall,
+  onToggleMute,
   onReset,
   isDisabled = false,
 }) => {
   const isIdle = status === "idle";
   const isConnecting = status === "connecting" || status === "ringing";
   const isInProgress = status === "in-progress";
+  const isActive = isConnecting || isInProgress;
   const isEnded = status === "ended" || status === "failed";
 
   return (
@@ -40,33 +43,78 @@ const CallControls = ({
         </button>
       )}
 
-      {/* Connecting state - show loading */}
-      {isConnecting && (
-        <button className="btn btn-warning btn-lg gap-2" disabled>
-          <span className="loading loading-spinner"></span>
-          Connecting...
-        </button>
+      {/* Active call controls - mute and end */}
+      {isActive && (
+        <div className="flex items-center gap-3">
+          {/* Mute Button - only show when in-progress */}
+          {isInProgress && (
+            <button
+              onClick={onToggleMute}
+              className={`btn btn-circle btn-lg ${
+                isMuted ? "btn-warning" : "btn-ghost border-base-300"
+              }`}
+              title={isMuted ? "Unmute" : "Mute"}
+            >
+              {isMuted ? (
+                // Muted icon
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 19L5 5m14 0v5.586c0 .89-.963 1.448-1.72.998l-3.005-1.789M12 18.75a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25c0 .17-.014.337-.042.5"
+                  />
+                </svg>
+              ) : (
+                // Unmuted icon
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+                  />
+                </svg>
+              )}
+            </button>
+          )}
+
+          {/* End Call Button */}
+          <button onClick={onEndCall} className="btn btn-error btn-lg gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 3.75L18 6m0 0l2.25 2.25M18 6l2.25-2.25M18 6l-2.25 2.25m1.5 13.5c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 014.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.055.902-.417 1.173l-1.293.97a.077.077 0 00-.013.018c-.162.441-.162.928.113 1.39a12.036 12.036 0 007.13 7.13c.462.275.949.275 1.39.113a.077.077 0 00.018-.013l.97-1.293c.271-.362.733-.527 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 01-2.25 2.25h-2.25z"
+              />
+            </svg>
+            {isConnecting ? "Cancel" : "End Call"}
+          </button>
+        </div>
       )}
 
-      {/* End Call Button - show during call */}
-      {isInProgress && (
-        <button onClick={onEndCall} className="btn btn-error btn-lg gap-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 3.75L18 6m0 0l2.25 2.25M18 6l2.25-2.25M18 6l-2.25 2.25m1.5 13.5c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 014.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.055.902-.417 1.173l-1.293.97a.077.077 0 00-.013.018c-.162.441-.162.928.113 1.39a12.036 12.036 0 007.13 7.13c.462.275.949.275 1.39.113a.077.077 0 00.018-.013l.97-1.293c.271-.362.733-.527 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 01-2.25 2.25h-2.25z"
-            />
-          </svg>
-          End Call
-        </button>
+      {/* Muted indicator */}
+      {isInProgress && isMuted && (
+        <p className="text-sm text-warning font-medium">Microphone muted</p>
       )}
 
       {/* New Call Button - show after call ended */}

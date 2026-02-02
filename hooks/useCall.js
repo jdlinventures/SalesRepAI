@@ -15,12 +15,19 @@ export function useCall(agentId) {
   const [callId, setCallId] = useState(null);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(null);
+  const [isMuted, setIsMuted] = useState(false);
 
   // Refs for cleanup and timing
   const clientRef = useRef(null);
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
   const providerRef = useRef(null);
+  const transcriptRef = useRef([]);
+
+  // Keep transcriptRef in sync with transcript state
+  useEffect(() => {
+    transcriptRef.current = transcript;
+  }, [transcript]);
 
   // Update duration every second while in-progress
   useEffect(() => {
@@ -64,6 +71,7 @@ export function useCall(agentId) {
       setTranscript([]);
       setError(null);
       setDuration(0);
+      setIsMuted(false);
       providerRef.current = provider;
 
       try {
@@ -151,18 +159,19 @@ export function useCall(agentId) {
 
       try {
         // Save final transcript and duration to database
+        // Use transcriptRef to get the latest transcript value
         await apiClient.patch(`/agents/${agentId}/calls/${id}`, {
           status: "ended",
           endedAt: new Date().toISOString(),
           duration: finalDuration,
-          transcript: transcript,
+          transcript: transcriptRef.current,
           endReason: "user_hangup",
         });
       } catch (err) {
         console.error("Failed to update call record:", err);
       }
     },
-    [agentId, transcript]
+    [agentId]
   );
 
   // Handle call failed - update database
@@ -181,6 +190,14 @@ export function useCall(agentId) {
     [agentId]
   );
 
+  // Toggle mute state
+  const toggleMute = useCallback(() => {
+    if (clientRef.current && status === "in-progress") {
+      const newMutedState = clientRef.current.toggleMute();
+      setIsMuted(newMutedState);
+    }
+  }, [status]);
+
   // Reset to idle state
   const reset = useCallback(() => {
     if (clientRef.current) {
@@ -192,6 +209,7 @@ export function useCall(agentId) {
     setCallId(null);
     setDuration(0);
     setError(null);
+    setIsMuted(false);
     startTimeRef.current = null;
   }, []);
 
@@ -202,6 +220,7 @@ export function useCall(agentId) {
     callId,
     duration,
     error,
+    isMuted,
     isConnected: status === "in-progress",
     isConnecting: status === "connecting" || status === "ringing",
     isEnded: status === "ended" || status === "failed",
@@ -209,6 +228,7 @@ export function useCall(agentId) {
     // Actions
     startCall,
     endCall,
+    toggleMute,
     reset,
   };
 }

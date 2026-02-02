@@ -5,6 +5,7 @@ export class ElevenLabsCallClient {
   constructor() {
     this.socket = null;
     this.isConnected = false;
+    this.isMuted = false;
     this.eventHandlers = {};
     this.currentTranscript = [];
     this.audioContext = null;
@@ -148,7 +149,7 @@ export class ElevenLabsCallClient {
     const processor = this.audioContext.createScriptProcessor(4096, 1, 1);
 
     processor.onaudioprocess = (event) => {
-      if (!this.isConnected) return;
+      if (!this.isConnected || this.isMuted) return;
 
       const inputData = event.inputBuffer.getChannelData(0);
       // Convert Float32Array to Int16Array for sending
@@ -224,6 +225,22 @@ export class ElevenLabsCallClient {
       console.error("ElevenLabs endCall error:", error);
       throw error;
     }
+  }
+
+  // Mute microphone
+  mute() {
+    this.isMuted = true;
+  }
+
+  // Unmute microphone
+  unmute() {
+    this.isMuted = false;
+  }
+
+  // Toggle mute state
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    return this.isMuted;
   }
 
   // Clean up resources

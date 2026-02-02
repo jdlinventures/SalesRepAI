@@ -11,6 +11,7 @@ export class VapiCallClient {
     }
     this.client = new Vapi(publicKey);
     this.isConnected = false;
+    this.isMuted = false;
     this.eventHandlers = {};
     this.currentTranscript = [];
   }
@@ -94,6 +95,36 @@ export class VapiCallClient {
       console.error("Vapi endCall error:", error);
       throw error;
     }
+  }
+
+  // Mute microphone
+  mute() {
+    try {
+      this.client.setMuted(true);
+      this.isMuted = true;
+    } catch (error) {
+      console.error("Vapi mute error:", error);
+    }
+  }
+
+  // Unmute microphone
+  unmute() {
+    try {
+      this.client.setMuted(false);
+      this.isMuted = false;
+    } catch (error) {
+      console.error("Vapi unmute error:", error);
+    }
+  }
+
+  // Toggle mute state
+  toggleMute() {
+    if (this.isMuted) {
+      this.unmute();
+    } else {
+      this.mute();
+    }
+    return this.isMuted;
   }
 
   // Clean up resources

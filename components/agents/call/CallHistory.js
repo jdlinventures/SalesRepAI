@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import apiClient from "@/libs/api";
 import CallTranscript from "./CallTranscript";
 
@@ -49,6 +50,46 @@ const CallHistory = ({ agentId, onClose }) => {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Format transcript as text
+  const formatTranscriptAsText = (transcript) => {
+    if (!transcript || transcript.length === 0) return "No transcript available.";
+    return transcript
+      .map((entry) => `${entry.role === "user" ? "You" : "Agent"}: ${entry.content}`)
+      .join("\n\n");
+  };
+
+  // Copy transcript to clipboard
+  const handleCopyTranscript = async () => {
+    if (!selectedCall?.transcript) return;
+    const text = formatTranscriptAsText(selectedCall.transcript);
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Transcript copied to clipboard");
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      toast.error("Failed to copy transcript");
+    }
+  };
+
+  // Download transcript as text file
+  const handleDownloadTranscript = () => {
+    if (!selectedCall?.transcript) return;
+    const text = formatTranscriptAsText(selectedCall.transcript);
+    const date = formatDate(selectedCall.startedAt || selectedCall.createdAt).replace(/[/:]/g, "-");
+    const filename = `transcript-${date}.txt`;
+
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("Transcript downloaded");
+  };
+
   // Delete a call
   const handleDelete = async (callId, e) => {
     e.stopPropagation();
@@ -95,6 +136,8 @@ const CallHistory = ({ agentId, onClose }) => {
 
   // Show call detail view
   if (selectedCall) {
+    const hasTranscript = selectedCall.transcript && selectedCall.transcript.length > 0;
+
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-2">
@@ -149,7 +192,55 @@ const CallHistory = ({ agentId, onClose }) => {
         </div>
 
         <div>
-          <h4 className="font-medium mb-2">Transcript</h4>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-medium">Transcript</h4>
+            {hasTranscript && (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCopyTranscript}
+                  className="btn btn-ghost btn-sm gap-1"
+                  title="Copy transcript"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
+                    />
+                  </svg>
+                  Copy
+                </button>
+                <button
+                  onClick={handleDownloadTranscript}
+                  className="btn btn-ghost btn-sm gap-1"
+                  title="Download transcript"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                    />
+                  </svg>
+                  Download
+                </button>
+              </div>
+            )}
+          </div>
           <CallTranscript transcript={selectedCall.transcript} isLive={false} />
         </div>
       </div>
