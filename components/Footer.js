@@ -24,9 +24,25 @@ const Footer = () => {
                 {config.appName}
               </span>
             </Link>
-            <p className="text-[14px] leading-[1.6] text-[#71717A]">
+            <p className="text-[14px] leading-[1.6] text-[#71717A] mb-4">
               {config.appDescription}
             </p>
+            <a
+              href="https://arkis.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-[13px] text-[#A1A1AA] hover:text-[#71717A] transition-colors"
+            >
+              A product by
+              <Image
+                src="/arkis-logo.png"
+                alt="Arkis"
+                width={14}
+                height={14}
+                className="opacity-50 group-hover:opacity-70"
+              />
+              <span className="text-[#71717A]">Arkis</span>
+            </a>
           </div>
 
           {/* Links Columns - Right side */}
