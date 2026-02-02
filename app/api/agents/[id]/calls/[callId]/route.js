@@ -64,28 +64,7 @@ export async function PATCH(req, { params }) {
     const { id, callId } = await params;
     const body = await req.json();
 
-    // Verify agent exists and belongs to user
-    const agent = await Agent.findOne({
-      _id: id,
-      userId: session.user.id,
-    });
-
-    if (!agent) {
-      return NextResponse.json({ error: "Agent not found" }, { status: 404 });
-    }
-
-    // Fetch and update the call
-    const call = await Call.findOne({
-      _id: callId,
-      agentId: id,
-      userId: session.user.id,
-    });
-
-    if (!call) {
-      return NextResponse.json({ error: "Call not found" }, { status: 404 });
-    }
-
-    // Update allowed fields
+    // Build update object with only allowed fields
     const allowedUpdates = [
       "status",
       "startedAt",
@@ -97,21 +76,41 @@ export async function PATCH(req, { params }) {
       "providerCallId",
     ];
 
+    const updateData = {};
     for (const field of allowedUpdates) {
       if (body[field] !== undefined) {
-        call[field] = body[field];
+        updateData[field] = body[field];
       }
+    }
+
+    // Use findOneAndUpdate to avoid version conflicts
+    const call = await Call.findOneAndUpdate(
+      {
+        _id: callId,
+        agentId: id,
+        userId: session.user.id,
+      },
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!call) {
+      return NextResponse.json({ error: "Call not found" }, { status: 404 });
     }
 
     // If call ended, update agent usage stats
     if (body.status === "ended" && body.duration) {
-      agent.lastUsedAt = new Date();
-      agent.totalCalls = (agent.totalCalls || 0) + 1;
-      agent.totalDuration = (agent.totalDuration || 0) + body.duration;
-      await agent.save();
+      await Agent.findOneAndUpdate(
+        { _id: id, userId: session.user.id },
+        {
+          $set: { lastUsedAt: new Date() },
+          $inc: {
+            totalCalls: 1,
+            totalDuration: body.duration,
+          },
+        }
+      );
     }
-
-    await call.save();
 
     return NextResponse.json({
       ...call.toJSON(),

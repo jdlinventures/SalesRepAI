@@ -113,8 +113,11 @@ export function useCall(agentId) {
           });
 
         // Start the call with provider credentials
-        await client.startCall(credentials);
+        // Note: Status will be set to "in-progress" by the call_started event handler
+        // Only set to "ringing" if we're still connecting (for providers that have a ringing phase)
         setStatus("ringing");
+        await client.startCall(credentials);
+        // Don't set status here - let the call_started event handler manage it
       } catch (err) {
         console.error("Failed to start call:", err);
         setError(err?.message || "Failed to start call");

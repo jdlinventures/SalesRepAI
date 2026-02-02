@@ -65,10 +65,13 @@ export class RetellCallClient {
         captureDeviceId: "default",
       });
       // Manually trigger call_started since SDK may not fire it reliably
-      if (this.eventHandlers.call_started && !this.isConnected) {
-        this.isConnected = true;
-        this.eventHandlers.call_started();
-      }
+      // Use setTimeout to ensure this runs after any pending state updates
+      setTimeout(() => {
+        if (this.eventHandlers.call_started && !this.isConnected) {
+          this.isConnected = true;
+          this.eventHandlers.call_started();
+        }
+      }, 100);
     } catch (error) {
       console.error("Retell startCall error:", error);
       throw error;
