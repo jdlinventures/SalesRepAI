@@ -23,7 +23,7 @@ const CallControls = ({
         <button
           onClick={onStartCall}
           disabled={isDisabled}
-          className="btn btn-primary btn-lg gap-2"
+          className="btn btn-primary h-12 px-6 text-[15px]"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -31,7 +31,7 @@ const CallControls = ({
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-6 h-6"
+            className="w-5 h-5"
           >
             <path
               strokeLinecap="round"
@@ -50,20 +50,21 @@ const CallControls = ({
           {isInProgress && (
             <button
               onClick={onToggleMute}
-              className={`btn btn-circle btn-lg ${
-                isMuted ? "btn-warning" : "btn-ghost border-base-300"
+              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                isMuted
+                  ? "bg-[#F59E0B] text-white"
+                  : "bg-[#F4F4F5] text-[#52525B] hover:bg-[#E4E4E7]"
               }`}
               title={isMuted ? "Unmute" : "Mute"}
             >
               {isMuted ? (
-                // Muted icon
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6"
+                  className="w-5 h-5"
                 >
                   <path
                     strokeLinecap="round"
@@ -72,14 +73,13 @@ const CallControls = ({
                   />
                 </svg>
               ) : (
-                // Unmuted icon
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6"
+                  className="w-5 h-5"
                 >
                   <path
                     strokeLinecap="round"
@@ -92,14 +92,17 @@ const CallControls = ({
           )}
 
           {/* End Call Button */}
-          <button onClick={onEndCall} className="btn btn-error btn-lg gap-2">
+          <button
+            onClick={onEndCall}
+            className="h-12 px-6 rounded-lg bg-[#DC2626] text-white text-[14px] font-medium flex items-center gap-2 hover:bg-[#B91C1C] transition-colors"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-6 h-6"
+              className="w-5 h-5"
             >
               <path
                 strokeLinecap="round"
@@ -114,19 +117,19 @@ const CallControls = ({
 
       {/* Muted indicator */}
       {isInProgress && isMuted && (
-        <p className="text-sm text-warning font-medium">Microphone muted</p>
+        <p className="text-[13px] text-[#F59E0B] font-medium">Microphone muted</p>
       )}
 
       {/* New Call Button - show after call ended */}
       {isEnded && (
-        <button onClick={onReset} className="btn btn-primary btn-lg gap-2">
+        <button onClick={onReset} className="btn btn-primary h-12 px-6 text-[15px]">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-6 h-6"
+            className="w-5 h-5"
           >
             <path
               strokeLinecap="round"

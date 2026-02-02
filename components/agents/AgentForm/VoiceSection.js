@@ -18,16 +18,14 @@ const VoiceSection = ({ formData, setFormData, errors }) => {
   };
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Voice & Model Settings</h3>
+    <div className="space-y-5">
+      <h3 className="text-h4">Voice & Model Settings</h3>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text font-medium">Voice *</span>
-          </label>
+        <div>
+          <label className="text-label block mb-2">Voice *</label>
           <select
-            className={`select select-bordered w-full ${errors.voiceId ? "select-error" : ""}`}
+            className={`select w-full ${errors.voiceId ? "!border-[#DC2626] focus:!border-[#DC2626]" : ""}`}
             value={formData.voiceId}
             onChange={handleVoiceChange}
           >
@@ -39,18 +37,14 @@ const VoiceSection = ({ formData, setFormData, errors }) => {
             ))}
           </select>
           {errors.voiceId && (
-            <label className="label">
-              <span className="label-text-alt text-error">{errors.voiceId}</span>
-            </label>
+            <p className="text-[13px] text-[#DC2626] mt-1.5">{errors.voiceId}</p>
           )}
         </div>
 
-        <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text font-medium">LLM Model</span>
-          </label>
+        <div>
+          <label className="text-label block mb-2">LLM Model</label>
           <select
-            className="select select-bordered w-full"
+            className="select w-full"
             value={formData.llmModel}
             onChange={(e) =>
               setFormData({ ...formData, llmModel: e.target.value })
@@ -64,12 +58,10 @@ const VoiceSection = ({ formData, setFormData, errors }) => {
           </select>
         </div>
 
-        <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text font-medium">Language</span>
-          </label>
+        <div>
+          <label className="text-label block mb-2">Language</label>
           <select
-            className="select select-bordered w-full"
+            className="select w-full"
             value={formData.language}
             onChange={(e) =>
               setFormData({ ...formData, language: e.target.value })

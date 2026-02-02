@@ -117,7 +117,7 @@ const AgentBuilder = ({ agentId = null }) => {
   if (isFetching) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <span className="loading loading-spinner loading-lg"></span>
+        <div className="loading-spinner" />
       </div>
     );
   }
@@ -130,7 +130,7 @@ const AgentBuilder = ({ agentId = null }) => {
         errors={errors}
       />
 
-      <div className="divider"></div>
+      <div className="h-[1px] bg-[#E4E4E7]" />
 
       <ProviderSection
         formData={formData}
@@ -138,7 +138,7 @@ const AgentBuilder = ({ agentId = null }) => {
         errors={errors}
       />
 
-      <div className="divider"></div>
+      <div className="h-[1px] bg-[#E4E4E7]" />
 
       <VoiceSection
         formData={formData}
@@ -146,7 +146,7 @@ const AgentBuilder = ({ agentId = null }) => {
         errors={errors}
       />
 
-      <div className="divider"></div>
+      <div className="h-[1px] bg-[#E4E4E7]" />
 
       <SystemPromptSection
         formData={formData}
@@ -154,11 +154,11 @@ const AgentBuilder = ({ agentId = null }) => {
         errors={errors}
       />
 
-      <div className="divider"></div>
+      <div className="h-[1px] bg-[#E4E4E7]" />
 
       <KnowledgeBaseSection formData={formData} setFormData={setFormData} />
 
-      <div className="flex justify-end gap-4 pt-4">
+      <div className="flex justify-end gap-3 pt-6 border-t border-[#E4E4E7]">
         <button
           type="button"
           className="btn btn-ghost"
@@ -172,7 +172,7 @@ const AgentBuilder = ({ agentId = null }) => {
           className="btn btn-primary"
           disabled={isLoading}
         >
-          {isLoading && <span className="loading loading-spinner loading-sm"></span>}
+          {isLoading && <div className="loading-spinner !w-4 !h-4 !border-white/30 !border-t-white" />}
           {isEditMode ? "Save Changes" : "Create Agent"}
         </button>
       </div>

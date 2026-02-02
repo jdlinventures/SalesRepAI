@@ -7,21 +7,21 @@ const SystemPromptSection = ({ formData, setFormData, errors }) => {
   const charPercentage = (charCount / maxLength) * 100;
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">System Prompt</h3>
+    <div className="space-y-5">
+      <h3 className="text-h4">System Prompt</h3>
 
-      <div className="form-control w-full">
-        <label className="label">
-          <span className="label-text font-medium">Agent Instructions *</span>
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-label">Agent Instructions *</label>
           <span
-            className={`label-text-alt ${charPercentage > 90 ? "text-warning" : ""}`}
+            className={`text-[12px] ${charPercentage > 90 ? "text-[#F59E0B]" : "text-[#A1A1AA]"}`}
           >
             {charCount.toLocaleString()}/{maxLength.toLocaleString()}
           </span>
-        </label>
+        </div>
         <textarea
           placeholder="Define how your agent should behave, what information it has access to, and how it should respond to different situations..."
-          className={`textarea textarea-bordered w-full h-64 font-mono text-sm ${errors.systemPrompt ? "textarea-error" : ""}`}
+          className={`textarea w-full h-64 font-mono text-[13px] ${errors.systemPrompt ? "!border-[#DC2626] focus:!border-[#DC2626]" : ""}`}
           value={formData.systemPrompt}
           onChange={(e) =>
             setFormData({ ...formData, systemPrompt: e.target.value })
@@ -29,15 +29,11 @@ const SystemPromptSection = ({ formData, setFormData, errors }) => {
           maxLength={maxLength}
         />
         {errors.systemPrompt && (
-          <label className="label">
-            <span className="label-text-alt text-error">{errors.systemPrompt}</span>
-          </label>
+          <p className="text-[13px] text-[#DC2626] mt-1.5">{errors.systemPrompt}</p>
         )}
-        <label className="label">
-          <span className="label-text-alt text-base-content/60">
-            Tip: Be specific about the agent's role, personality, and what information it should or shouldn't share.
-          </span>
-        </label>
+        <p className="text-caption mt-1.5">
+          Tip: Be specific about the agent's role, personality, and what information it should or shouldn't share.
+        </p>
       </div>
     </div>
   );

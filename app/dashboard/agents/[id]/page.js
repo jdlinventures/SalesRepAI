@@ -8,10 +8,10 @@ export default function EditAgentPage({ params }) {
   const { id } = use(params);
 
   return (
-    <div className="p-4 md:p-8 max-w-4xl mx-auto">
+    <div className="p-6 lg:p-8 max-w-[800px] mx-auto">
       <div className="mb-8">
-        <div className="flex items-center gap-2 text-sm text-base-content/60 mb-4">
-          <Link href="/dashboard/agents" className="hover:text-primary">
+        <div className="flex items-center gap-2 text-[13px] text-[#71717A] mb-4">
+          <Link href="/dashboard/agents" className="hover:text-[#18181B] transition-colors">
             Agents
           </Link>
           <svg
@@ -20,7 +20,7 @@ export default function EditAgentPage({ params }) {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-4 h-4"
+            className="w-3.5 h-3.5"
           >
             <path
               strokeLinecap="round"
@@ -28,18 +28,16 @@ export default function EditAgentPage({ params }) {
               d="M8.25 4.5l7.5 7.5-7.5 7.5"
             />
           </svg>
-          <span>Edit Agent</span>
+          <span className="text-[#18181B]">Edit Agent</span>
         </div>
-        <h1 className="text-2xl font-bold">Edit Agent</h1>
-        <p className="text-base-content/60 mt-1">
+        <h1 className="text-h2 mb-1">Edit Agent</h1>
+        <p className="text-body-sm">
           Update your AI voice agent's configuration.
         </p>
       </div>
 
-      <div className="card bg-base-100 shadow-md border border-base-300">
-        <div className="card-body">
-          <AgentBuilder agentId={id} />
-        </div>
+      <div className="card-flat p-6">
+        <AgentBuilder agentId={id} />
       </div>
     </div>
   );

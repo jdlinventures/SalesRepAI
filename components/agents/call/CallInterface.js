@@ -81,7 +81,7 @@ const CallInterface = ({ agentId }) => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
-        <span className="loading loading-spinner loading-lg"></span>
+        <div className="loading-spinner" />
       </div>
     );
   }
@@ -89,7 +89,7 @@ const CallInterface = ({ agentId }) => {
   if (!agent) {
     return (
       <div className="text-center py-12">
-        <p className="text-error">Agent not found</p>
+        <p className="text-[14px] text-[#DC2626]">Agent not found</p>
       </div>
     );
   }
@@ -98,18 +98,18 @@ const CallInterface = ({ agentId }) => {
   const canMakeCall = agent.providerAgentId && micPermission !== "denied";
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-[600px] mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-bold">{agent.name}</h2>
-          <span className="badge badge-ghost badge-sm">
+          <h2 className="text-[18px] font-semibold text-[#18181B]">{agent.name}</h2>
+          <span className="badge-subtle">
             {providerLabels[agent.provider] || agent.provider}
           </span>
         </div>
         <button
           onClick={() => setShowHistory(!showHistory)}
-          className="btn btn-ghost btn-sm gap-2"
+          className="btn btn-ghost btn-sm"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +117,7 @@ const CallInterface = ({ agentId }) => {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-5 h-5"
+            className="w-4 h-4"
           >
             <path
               strokeLinecap="round"
@@ -133,18 +133,18 @@ const CallInterface = ({ agentId }) => {
       {showHistory ? (
         <CallHistory agentId={agentId} onClose={() => setShowHistory(false)} />
       ) : (
-        <div className="card bg-base-100 shadow-lg border border-base-300">
-          <div className="card-body items-center text-center space-y-6">
+        <div className="card-flat p-6">
+          <div className="flex flex-col items-center text-center space-y-6">
             {/* Warnings */}
             {!agent.providerAgentId && (
-              <div className="alert alert-warning">
+              <div className="flex items-center gap-3 w-full p-4 bg-[#FFFBEB] border border-[#FDE68A] rounded-xl">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6 shrink-0"
+                  className="w-5 h-5 text-[#F59E0B] flex-shrink-0"
                 >
                   <path
                     strokeLinecap="round"
@@ -152,19 +152,19 @@ const CallInterface = ({ agentId }) => {
                     d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
                   />
                 </svg>
-                <span>Agent not synced with provider. Please edit and save the agent first.</span>
+                <span className="text-[13px] text-[#92400E] text-left">Agent not synced with provider. Please edit and save the agent first.</span>
               </div>
             )}
 
             {micPermission === "denied" && (
-              <div className="alert alert-error">
+              <div className="flex items-center gap-3 w-full p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-xl">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6 shrink-0"
+                  className="w-5 h-5 text-[#DC2626] flex-shrink-0"
                 >
                   <path
                     strokeLinecap="round"
@@ -172,20 +172,20 @@ const CallInterface = ({ agentId }) => {
                     d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
                   />
                 </svg>
-                <span>Microphone access denied. Please enable it in your browser settings.</span>
+                <span className="text-[13px] text-[#DC2626] text-left">Microphone access denied. Please enable it in your browser settings.</span>
               </div>
             )}
 
             {/* Error display */}
             {error && (
-              <div className="alert alert-error">
+              <div className="flex items-center gap-3 w-full p-4 bg-[#FEF2F2] border border-[#FECACA] rounded-xl">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-6 h-6 shrink-0"
+                  className="w-5 h-5 text-[#DC2626] flex-shrink-0"
                 >
                   <path
                     strokeLinecap="round"
@@ -193,7 +193,7 @@ const CallInterface = ({ agentId }) => {
                     d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
                   />
                 </svg>
-                <span>{error}</span>
+                <span className="text-[13px] text-[#DC2626] text-left">{error}</span>
               </div>
             )}
 
@@ -218,7 +218,7 @@ const CallInterface = ({ agentId }) => {
 
             {/* Mic permission prompt */}
             {status === "idle" && micPermission === "prompt" && (
-              <p className="text-sm text-base-content/60">
+              <p className="text-[13px] text-[#71717A]">
                 Microphone access will be requested when you start the call
               </p>
             )}
