@@ -155,3 +155,25 @@ export async function fetchVoices() {
     return voices; // Fallback to static list
   }
 }
+
+/**
+ * Get a signed URL for ElevenLabs conversational AI WebSocket connection
+ */
+export async function getSignedUrl(providerAgentId) {
+  if (!isProviderConfigured("elevenlabs")) {
+    throw new Error("ElevenLabs API key not configured");
+  }
+
+  if (!providerAgentId) {
+    throw new Error("Provider agent ID is required for ElevenLabs calls");
+  }
+
+  return withProviderErrorHandling("elevenlabs", "getSignedUrl", async () => {
+    const response = await elevenLabsClient.get(
+      `/v1/convai/conversation/get_signed_url?agent_id=${providerAgentId}`
+    );
+    return {
+      signedUrl: response.data.signed_url,
+    };
+  });
+}

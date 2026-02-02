@@ -1,0 +1,252 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import apiClient from "@/libs/api";
+import useCall from "@/hooks/useCall";
+import CallStatus from "./CallStatus";
+import CallControls from "./CallControls";
+import CallTranscript from "./CallTranscript";
+import CallHistory from "./CallHistory";
+
+const providerLabels = {
+  retell: "Retell AI",
+  vapi: "Vapi",
+  elevenlabs: "ElevenLabs",
+};
+
+// Main call interface container
+const CallInterface = ({ agentId }) => {
+  const router = useRouter();
+  const [agent, setAgent] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [showHistory, setShowHistory] = useState(false);
+  const [micPermission, setMicPermission] = useState(null); // null, 'granted', 'denied', 'prompt'
+
+  const {
+    status,
+    transcript,
+    duration,
+    error,
+    isConnected,
+    isConnecting,
+    startCall,
+    endCall,
+    reset,
+  } = useCall(agentId);
+
+  // Fetch agent details
+  useEffect(() => {
+    const fetchAgent = async () => {
+      try {
+        const data = await apiClient.get(`/agents/${agentId}`);
+        setAgent(data);
+      } catch (e) {
+        console.error("Failed to fetch agent:", e);
+        router.push("/dashboard/agents");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (agentId) {
+      fetchAgent();
+    }
+  }, [agentId, router]);
+
+  // Check microphone permission on mount
+  useEffect(() => {
+    const checkMicPermission = async () => {
+      try {
+        const result = await navigator.permissions.query({ name: "microphone" });
+        setMicPermission(result.state);
+        result.onchange = () => setMicPermission(result.state);
+      } catch (e) {
+        // Permissions API not supported, will check on call start
+        setMicPermission("prompt");
+      }
+    };
+
+    checkMicPermission();
+  }, []);
+
+  // Handle start call
+  const handleStartCall = () => {
+    if (!agent?.provider) return;
+    startCall(agent.provider);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  if (!agent) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-error">Agent not found</p>
+      </div>
+    );
+  }
+
+  // Check if agent can make calls
+  const canMakeCall = agent.providerAgentId && micPermission !== "denied";
+
+  return (
+    <div className="max-w-2xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold">{agent.name}</h2>
+          <span className="badge badge-ghost badge-sm">
+            {providerLabels[agent.provider] || agent.provider}
+          </span>
+        </div>
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className="btn btn-ghost btn-sm gap-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          History
+        </button>
+      </div>
+
+      {/* Show history or call interface */}
+      {showHistory ? (
+        <CallHistory agentId={agentId} onClose={() => setShowHistory(false)} />
+      ) : (
+        <div className="card bg-base-100 shadow-lg border border-base-300">
+          <div className="card-body items-center text-center space-y-6">
+            {/* Warnings */}
+            {!agent.providerAgentId && (
+              <div className="alert alert-warning">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6 shrink-0"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                  />
+                </svg>
+                <span>Agent not synced with provider. Please edit and save the agent first.</span>
+              </div>
+            )}
+
+            {micPermission === "denied" && (
+              <div className="alert alert-error">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6 shrink-0"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"
+                  />
+                </svg>
+                <span>Microphone access denied. Please enable it in your browser settings.</span>
+              </div>
+            )}
+
+            {/* Error display */}
+            {error && (
+              <div className="alert alert-error">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6 shrink-0"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+                  />
+                </svg>
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* Status indicator */}
+            <CallStatus status={status} duration={duration} />
+
+            {/* Transcript */}
+            <div className="w-full">
+              <CallTranscript transcript={transcript} isLive={isConnected} />
+            </div>
+
+            {/* Controls */}
+            <CallControls
+              status={status}
+              onStartCall={handleStartCall}
+              onEndCall={endCall}
+              onReset={reset}
+              isDisabled={!canMakeCall}
+            />
+
+            {/* Mic permission prompt */}
+            {status === "idle" && micPermission === "prompt" && (
+              <p className="text-sm text-base-content/60">
+                Microphone access will be requested when you start the call
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Back to agents link */}
+      <div className="mt-6 text-center">
+        <button
+          onClick={() => router.push("/dashboard/agents")}
+          className="btn btn-ghost btn-sm"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-4 h-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15.75 19.5L8.25 12l7.5-7.5"
+            />
+          </svg>
+          Back to Agents
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default CallInterface;

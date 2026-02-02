@@ -134,3 +134,27 @@ export async function fetchVoices() {
     return voices; // Fallback to static list
   }
 }
+
+/**
+ * Register a web call with Retell
+ * Returns an access token for the RetellWebClient
+ */
+export async function registerCall(providerAgentId) {
+  if (!isProviderConfigured("retell")) {
+    throw new Error("Retell API key not configured");
+  }
+
+  if (!providerAgentId) {
+    throw new Error("Provider agent ID is required for Retell calls");
+  }
+
+  return withProviderErrorHandling("retell", "registerCall", async () => {
+    const response = await retellClient.post("/v2/create-web-call", {
+      agent_id: providerAgentId,
+    });
+    return {
+      accessToken: response.data.access_token,
+      callId: response.data.call_id,
+    };
+  });
+}
