@@ -113,12 +113,51 @@ const CallRow = ({ call, onClick }) => (
 const CallDetailModal = ({ call, onClose }) => {
   const [fullCall, setFullCall] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingRecording, setIsLoadingRecording] = useState(false);
+  const [recordingStatus, setRecordingStatus] = useState("idle"); // idle, loading, available, pending, error
 
   useEffect(() => {
     const fetchCall = async () => {
       try {
         const data = await apiClient.get(`/calls/${call.id}`);
         setFullCall(data);
+
+        // If call is ended, try to fetch recording details
+        if (data.status === "ended") {
+          if (data.recordingUrl) {
+            setRecordingStatus("available");
+          } else {
+            setIsLoadingRecording(true);
+            setRecordingStatus("loading");
+            try {
+              const recordingData = await apiClient.post(`/calls/${call.id}/recording`);
+              console.log("[Frontend] Recording data received:", {
+                hasRecordingUrl: !!recordingData.recordingUrl,
+                recordingUrl: recordingData.recordingUrl?.substring(0, 50),
+                estimatedCost: recordingData.estimatedCost,
+                transcriptLength: recordingData.transcript?.length,
+                recordingPending: recordingData.recordingPending,
+              });
+              setFullCall((prev) => ({
+                ...prev,
+                recordingUrl: recordingData.recordingUrl || prev.recordingUrl,
+                estimatedCost: recordingData.estimatedCost ?? prev.estimatedCost,
+                transcript: recordingData.transcript?.length > 0 ? recordingData.transcript : prev.transcript,
+              }));
+              // Set recording status based on result
+              if (recordingData.recordingUrl) {
+                setRecordingStatus("available");
+              } else {
+                setRecordingStatus("pending");
+              }
+            } catch (e) {
+              console.log("Recording not available:", e.message);
+              setRecordingStatus("error");
+            } finally {
+              setIsLoadingRecording(false);
+            }
+          }
+        }
       } catch (e) {
         console.error(e);
       } finally {
@@ -188,7 +227,7 @@ const CallDetailModal = ({ call, onClose }) => {
         </div>
 
         {/* Call info */}
-        <div className="grid grid-cols-3 gap-4 p-5 border-b border-[#E4E4E7] bg-[#FAFAFA]">
+        <div className="grid grid-cols-4 gap-4 p-5 border-b border-[#E4E4E7] bg-[#FAFAFA]">
           <div>
             <p className="text-[12px] text-[#71717A] mb-1">Duration</p>
             <p className="text-[14px] font-medium text-[#18181B] font-mono">
@@ -211,7 +250,79 @@ const CallDetailModal = ({ call, onClose }) => {
               {providerLabels[call.provider] || call.provider}
             </p>
           </div>
+          <div>
+            <p className="text-[12px] text-[#71717A] mb-1">Est. Cost</p>
+            <p className="text-[14px] font-medium text-[#18181B]">
+              {fullCall?.estimatedCost != null
+                ? `$${fullCall.estimatedCost.toFixed(2)}`
+                : isLoadingRecording
+                ? "..."
+                : "-"}
+            </p>
+          </div>
         </div>
+
+        {/* Recording Player - Always show for ended calls */}
+        {call.status === "ended" && (
+          <div className="p-5 border-b border-[#E4E4E7]">
+            <h3 className="text-[14px] font-semibold text-[#18181B] mb-3">Recording</h3>
+            {recordingStatus === "loading" ? (
+              <div className="flex items-center gap-2 text-[13px] text-[#71717A]">
+                <div className="loading-spinner !w-4 !h-4" />
+                Loading recording...
+              </div>
+            ) : fullCall?.recordingUrl ? (
+              <audio
+                controls
+                className="w-full h-10"
+                src={fullCall.recordingUrl}
+              >
+                Your browser does not support the audio element.
+              </audio>
+            ) : recordingStatus === "pending" ? (
+              <div className="flex items-center gap-2 text-[13px] text-[#71717A]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                Recording is still processing. Please check back later.
+              </div>
+            ) : recordingStatus === "error" ? (
+              <div className="flex items-center gap-2 text-[13px] text-[#71717A]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
+                  />
+                </svg>
+                Recording not available for this call.
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-[13px] text-[#71717A]">
+                <div className="loading-spinner !w-4 !h-4" />
+                Checking for recording...
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Transcript */}
         <div className="flex-1 overflow-auto p-5">

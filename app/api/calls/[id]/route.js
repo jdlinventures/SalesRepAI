@@ -54,6 +54,9 @@ export async function GET(req, { params }) {
       transcript: call.transcript || [],
       endReason: call.endReason,
       errorMessage: call.errorMessage,
+      recordingUrl: call.recordingUrl || null,
+      estimatedCost: call.estimatedCost || null,
+      llmModel: call.llmModel || "gpt-4o",
       createdAt: call.createdAt,
     });
   } catch (e) {

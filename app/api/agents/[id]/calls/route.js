@@ -99,6 +99,7 @@ export async function POST(req, { params }) {
       agentId: agent._id,
       userId: session.user.id,
       provider: agent.provider,
+      llmModel: agent.llmModel || "gpt-4o",
       status: "pending",
     });
 

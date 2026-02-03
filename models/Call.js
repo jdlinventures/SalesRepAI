@@ -85,6 +85,21 @@ const callSchema = mongoose.Schema(
       type: String,
       default: null,
     },
+    // Recording URL from provider
+    recordingUrl: {
+      type: String,
+      default: null,
+    },
+    // Estimated cost in USD
+    estimatedCost: {
+      type: Number,
+      default: null,
+    },
+    // LLM model used (for cost calculation)
+    llmModel: {
+      type: String,
+      default: "gpt-4o",
+    },
   },
   {
     timestamps: true,

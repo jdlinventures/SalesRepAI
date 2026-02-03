@@ -194,3 +194,64 @@ export async function registerCall(providerAgentId) {
     };
   });
 }
+
+/**
+ * Get call details from Retell including recording URL
+ * Recording is available after the call ends
+ */
+export async function getCallDetails(providerCallId) {
+  if (!isProviderConfigured("retell")) {
+    throw new Error("Retell API key not configured");
+  }
+
+  if (!providerCallId) {
+    throw new Error("Provider call ID is required");
+  }
+
+  return withProviderErrorHandling("retell", "getCallDetails", async () => {
+    const response = await retellClient.get(`/v2/get-call/${providerCallId}`);
+    const data = response.data;
+
+    // Parse transcript - Retell may return it in different formats
+    let transcript = [];
+    if (data.transcript) {
+      if (Array.isArray(data.transcript)) {
+        transcript = data.transcript;
+      } else if (typeof data.transcript === "string") {
+        // Retell sometimes returns transcript as a plain text string
+        // We'll keep it as-is since it's already readable
+        transcript = data.transcript;
+      }
+    }
+    if (data.transcript_object && Array.isArray(data.transcript_object)) {
+      transcript = data.transcript_object;
+    }
+
+    // Log for debugging
+    console.log("[Retell] Call details:", {
+      callId: data.call_id,
+      status: data.call_status,
+      hasRecording: !!data.recording_url,
+      recording_url_raw: data.recording_url,
+      transcriptType: typeof data.transcript,
+      transcriptIsArray: Array.isArray(transcript),
+    });
+
+    const result = {
+      callId: data.call_id,
+      status: data.call_status,
+      recordingUrl: data.recording_url || null,
+      transcript,
+      startTime: data.start_timestamp,
+      endTime: data.end_timestamp,
+      duration: data.call_analysis?.call_duration_sec || null,
+    };
+
+    console.log("[Retell] Returning result:", {
+      recordingUrl: result.recordingUrl,
+      hasRecordingUrl: !!result.recordingUrl,
+    });
+
+    return result;
+  });
+}
