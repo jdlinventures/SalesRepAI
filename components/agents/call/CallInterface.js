@@ -217,7 +217,12 @@ const CallInterface = ({ agentId }) => {
             )}
 
             {/* Status indicator */}
-            <CallStatus status={status} duration={duration} />
+            <CallStatus
+              status={status}
+              duration={duration}
+              provider={agent?.provider}
+              llmModel={agent?.llmModel}
+            />
 
             {/* Transcript */}
             <div className="w-full">

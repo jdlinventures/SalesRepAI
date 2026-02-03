@@ -6,7 +6,7 @@ import { Popover, Transition } from "@headlessui/react";
 import { useSession, signOut } from "next-auth/react";
 import apiClient from "@/libs/api";
 
-const ButtonAccount = () => {
+const ButtonAccount = ({ collapsed = false }) => {
   const { data: session, status } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -33,7 +33,12 @@ const ButtonAccount = () => {
     <Popover className="relative">
       {({ open }) => (
         <>
-          <Popover.Button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-[#F4F4F5] transition-colors focus:outline-none">
+          <Popover.Button
+            className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg hover:bg-[#F4F4F5] transition-colors focus:outline-none ${
+              collapsed ? "justify-center" : ""
+            }`}
+            title={collapsed ? (session?.user?.name || session?.user?.email) : undefined}
+          >
             {session?.user?.image ? (
               <img
                 src={session?.user?.image}
@@ -47,32 +52,36 @@ const ButtonAccount = () => {
               </div>
             )}
 
-            <div className="flex-1 text-left min-w-0">
-              <p className="text-[13px] font-medium text-[#18181B] truncate">
-                {session?.user?.name || "Account"}
-              </p>
-              <p className="text-[12px] text-[#A1A1AA] truncate">
-                {session?.user?.email}
-              </p>
-            </div>
+            {!collapsed && (
+              <>
+                <div className="flex-1 text-left min-w-0">
+                  <p className="text-[13px] font-medium text-[#18181B] truncate">
+                    {session?.user?.name || "Account"}
+                  </p>
+                  <p className="text-[12px] text-[#A1A1AA] truncate">
+                    {session?.user?.email}
+                  </p>
+                </div>
 
-            {isLoading ? (
-              <div className="loading-spinner !w-4 !h-4" />
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className={`w-4 h-4 text-[#A1A1AA] transition-transform duration-150 flex-shrink-0 ${
-                  open ? "rotate-180" : ""
-                }`}
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                  clipRule="evenodd"
-                />
-              </svg>
+                {isLoading ? (
+                  <div className="loading-spinner !w-4 !h-4" />
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className={`w-4 h-4 text-[#A1A1AA] transition-transform duration-150 flex-shrink-0 ${
+                      open ? "rotate-180" : ""
+                    }`}
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                )}
+              </>
             )}
           </Popover.Button>
 

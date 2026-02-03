@@ -49,7 +49,7 @@ const navItems = [
   },
 ];
 
-const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
+const Sidebar = ({ isMobileOpen, setIsMobileOpen, isCollapsed, setIsCollapsed }) => {
   const pathname = usePathname();
 
   const isActive = (href) => {
@@ -71,23 +71,25 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-[256px] bg-white border-r border-[#E4E4E7] flex flex-col transform transition-transform duration-200 ease-out lg:translate-x-0 ${
-          isMobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 z-50 h-full bg-white border-r border-[#E4E4E7] flex flex-col transform transition-all duration-200 ease-out lg:translate-x-0 ${
+          isCollapsed ? "w-[72px]" : "w-[256px]"
+        } ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-5 border-b border-[#E4E4E7]">
-          <Link href="/" className="flex items-center gap-2.5">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-[#E4E4E7]">
+          <Link href="/" className={`flex items-center gap-2.5 ${isCollapsed ? "justify-center w-full" : ""}`}>
             <Image
               src={logo}
               alt={`${config.appName} logo`}
-              className="w-7 h-7"
+              className="w-7 h-7 flex-shrink-0"
               width={28}
               height={28}
             />
-            <span className="text-[15px] font-semibold text-[#18181B] tracking-[-0.01em]">
-              {config.appName}
-            </span>
+            {!isCollapsed && (
+              <span className="text-[15px] font-semibold text-[#18181B] tracking-[-0.01em]">
+                {config.appName}
+              </span>
+            )}
           </Link>
           <button
             className="lg:hidden p-1.5 -mr-1.5 rounded-md hover:bg-[#F4F4F5] transition-colors"
@@ -107,22 +109,48 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMobileOpen(false)}
+                title={isCollapsed ? item.label : undefined}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium transition-colors ${
+                  isCollapsed ? "justify-center" : ""
+                } ${
                   isActive(item.href)
                     ? "bg-[#F4F4F5] text-[#18181B]"
                     : "text-[#52525B] hover:bg-[#F4F4F5] hover:text-[#18181B]"
                 }`}
               >
                 {item.icon}
-                {item.label}
+                {!isCollapsed && item.label}
               </Link>
             ))}
           </div>
         </nav>
 
+        {/* Collapse toggle button */}
+        <div className="hidden lg:block px-3 py-2 border-t border-[#E4E4E7]">
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-[14px] font-medium text-[#52525B] hover:bg-[#F4F4F5] hover:text-[#18181B] transition-colors ${
+              isCollapsed ? "justify-center" : ""
+            }`}
+            title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className={`w-[18px] h-[18px] transition-transform ${isCollapsed ? "rotate-180" : ""}`}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5" />
+            </svg>
+            {!isCollapsed && "Collapse"}
+          </button>
+        </div>
+
         {/* User account */}
         <div className="p-3 border-t border-[#E4E4E7]">
-          <ButtonAccount />
+          <ButtonAccount collapsed={isCollapsed} />
         </div>
       </aside>
     </>
@@ -132,6 +160,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
 export default function LayoutPrivate({ children }) {
   const { data: session, status } = useSession();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   if (status === "loading") {
     return (
@@ -147,10 +176,15 @@ export default function LayoutPrivate({ children }) {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
-      <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
+      <Sidebar
+        isMobileOpen={isMobileOpen}
+        setIsMobileOpen={setIsMobileOpen}
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
+      />
 
       {/* Main content */}
-      <div className="lg:pl-[256px]">
+      <div className={`transition-all duration-200 ${isCollapsed ? "lg:pl-[72px]" : "lg:pl-[256px]"}`}>
         {/* Mobile header */}
         <header className="lg:hidden sticky top-0 z-30 h-16 bg-white/80 backdrop-blur-lg border-b border-[#E4E4E7] flex items-center px-4">
           <button
