@@ -58,6 +58,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...(connectMongo && { adapter: MongoDBAdapter(connectMongo) }),
 
   callbacks: {
+    jwt: async ({ token, user, account }) => {
+      // On initial sign in, persist the user ID to the token
+      if (user) {
+        token.sub = user.id;
+      }
+      return token;
+    },
     session: async ({ session, token }) => {
       if (session?.user && token.sub) {
         session.user.id = token.sub;
