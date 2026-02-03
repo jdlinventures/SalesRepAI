@@ -98,35 +98,54 @@ const CallInterface = ({ agentId }) => {
   const canMakeCall = agent.providerAgentId && micPermission !== "denied";
 
   return (
-    <div className="max-w-[600px] mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-[18px] font-semibold text-[#18181B]">{agent.name}</h2>
-          <span className="badge-subtle">
-            {providerLabels[agent.provider] || agent.provider}
-          </span>
-        </div>
-        <button
-          onClick={() => setShowHistory(!showHistory)}
-          className="btn btn-ghost btn-sm"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-4 h-4"
+    <div>
+      {/* Page header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-h2 mb-1">Call</h1>
+            <p className="text-body-sm">
+              Start a voice conversation with your AI agent.
+            </p>
+          </div>
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className="btn btn-ghost"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          History
-        </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Call History
+          </button>
+        </div>
+      </div>
+
+      {/* Agent info card */}
+      <div className="card-flat p-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#F4F4F5] flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-[#71717A]">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-[15px] font-semibold text-[#18181B]">{agent.name}</h2>
+            <span className="text-[13px] text-[#71717A]">
+              {providerLabels[agent.provider] || agent.provider}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Show history or call interface */}
@@ -226,29 +245,6 @@ const CallInterface = ({ agentId }) => {
         </div>
       )}
 
-      {/* Back to agents link */}
-      <div className="mt-6 text-center">
-        <button
-          onClick={() => router.push("/dashboard/agents")}
-          className="btn btn-ghost btn-sm"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="w-4 h-4"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 19.5L8.25 12l7.5-7.5"
-            />
-          </svg>
-          Back to Agents
-        </button>
-      </div>
     </div>
   );
 };
